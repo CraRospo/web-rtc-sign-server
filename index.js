@@ -2,12 +2,13 @@ const WebSocket = require('ws')
 const WebSocketServer = WebSocket.Server;
 
 // 创建 websocket 服务器 监听在 3000 端口
-const wss = new WebSocketServer({port: 8000})
+const wss = new WebSocketServer({port: 8010})
 
 // 服务器被客户端连接
 wss.on('connection', (ws, req) => {
   console.log(req.socket.remoteAddress)
   console.log(req.headers)
+  console.log('开始链接')
   const test = {
     type: 'text',
     data: {
@@ -46,3 +47,10 @@ wss.on('connection', (ws, req) => {
     })
   })
 })
+
+wss.on('wsClientError', (err, ws, req) => {
+  console.log('client-error')
+  console.log(error)
+})
+
+wss.on('error',(error) => console.log('error' + error) )
