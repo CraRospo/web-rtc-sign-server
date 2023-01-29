@@ -1,14 +1,36 @@
+const express = require('express')
+const http = require('http')
+const UserRouter = require('./routes/user')
+const mongoose = require('mongoose')
 const WebSocket = require('ws')
-const WebSocketServer = WebSocket.Server;
+const WebSocketServer = WebSocket.Server
+
+const app = express()
+// 设置默认 mongoose 连接
+const mongoDB = 'mongodb://127.0.0.1/admin';
+mongoose.connect(mongoDB);
+// 让 mongoose 使用全局 Promise 库
+mongoose.Promise = global.Promise;
+// 取得默认连接
+const db = mongoose.connection;
+
+// 将连接与错误事件绑定（以获得连接错误的提示）
+db.on('error', console.error.bind(console, 'MongoDB 连接错误：'));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use('/api', UserRouter)
+app.set('port', 8020)
+
+const server = http.createServer(app)
+
+server.listen(8020)
 
 // 创建 websocket 服务器 监听在 3000 端口
 const wss = new WebSocketServer({port: 8010})
 
 // 服务器被客户端连接
 wss.on('connection', (ws, req) => {
-  console.log(req.socket.remoteAddress)
-  console.log(req.headers)
-  console.log('开始链接')
   const test = {
     type: 'text',
     data: {
