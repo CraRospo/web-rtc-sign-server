@@ -95,18 +95,6 @@ wss.on('connection', (ws, req) => {
 
     wss.clients.forEach(client => {
       switch (type) {
-        case 'offer':
-          if(client !== ws) {
-            client.send(msg)
-          }
-          break;
-
-        case 'answer':
-          if(client !== ws) {
-            client.send(msg)
-          }
-          break;
-        
         case 'connect':
           if(data === client.connectionId) {
             client.send(JSON.stringify({
@@ -119,22 +107,11 @@ wss.on('connection', (ws, req) => {
           }
           
           break;
+        case 'offer':
+        case 'answer':
         case 'accept':
-          if (client !== ws) {
-            client.send(msg)
-          }
-          break;
-
         case 'denied':
-          if (client !== ws) {
-            client.send(msg)
-          }
-          break;
         case 'file-sender':
-          if(client !== ws) {
-            client.send(msg)
-          }
-          break;
         case 'file-receiver':
           if(client !== ws) {
             client.send(msg)
@@ -156,14 +133,14 @@ wss.on('connection', (ws, req) => {
       }
     })
 
-    // 关闭链接
-    ws.on('close', function () {
-      map.delete(userId);
-    });
-
     // 错误链接
     ws.on('error', console.error);
   })
+
+  // 关闭链接
+  ws.on('close', function () {
+    map.delete(userId);
+  });
 })
 
 function onSocketError(err) {
