@@ -130,7 +130,16 @@ wss.on('connection', (ws, req) => {
             client.send(msg)
           }
           break;
-
+        case 'file-sender':
+          if(client !== ws) {
+            client.send(msg)
+          }
+          break;
+        case 'file-receiver':
+          if(client !== ws) {
+            client.send(msg)
+          }
+          break;
         default:
           if (client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify({
@@ -149,7 +158,6 @@ wss.on('connection', (ws, req) => {
 
     // 关闭链接
     ws.on('close', function () {
-      console.log('c')
       map.delete(userId);
     });
 
