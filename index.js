@@ -113,6 +113,10 @@ wss.on('connection', (ws, req) => {
         case 'denied':
         case 'file-sender':
         case 'file-receiver':
+        case 'stream-offer':
+        case 'stream-answer':
+        case 'stream-abort':
+        case 'new-ice-candidate':
           if(client !== ws) {
             client.send(msg)
           }
