@@ -2,24 +2,24 @@ const express = require('express')
 const session = require('express-session')
 const http = require('http')
 const UserRouter = require('./routes/user')
-// const mongoose = require('mongoose')
+const mongoose = require('mongoose')
 const WebSocket = require('ws')
 const WebSocketServer = WebSocket.Server
 
 const app = express()
 map = new Map()
 const cacheChannel = new Map()
-// // 设置默认 mongoose 连接
-// const mongoDB = 'mongodb://127.0.0.1/admin';
-// mongoose.set('strictQuery', false);
-// mongoose.connect(mongoDB);
-// // 让 mongoose 使用全局 Promise 库
-// mongoose.Promise = global.Promise;
-// // 取得默认连接
-// const db = mongoose.connection;
+// 设置默认 mongoose 连接
+const mongoDB = 'mongodb://127.0.0.1/admin';
+mongoose.set('strictQuery', false);
+mongoose.connect(mongoDB);
+// 让 mongoose 使用全局 Promise 库
+mongoose.Promise = global.Promise;
+// 取得默认连接
+const db = mongoose.connection;
 
-// // 将连接与错误事件绑定（以获得连接错误的提示）
-// db.on('error', console.error.bind(console, 'MongoDB 连接错误：'));
+// 将连接与错误事件绑定（以获得连接错误的提示）
+db.on('error', console.error.bind(console, 'MongoDB 连接错误：'));
 
 // 创建session-parse
 const sessionParser = session({
@@ -47,6 +47,7 @@ const wss = new WebSocketServer({ clientTracking: true, noServer: true });
 
 // 监听upgrade
 server.on('upgrade', function (request, socket, head) {
+  console.log('upgrade')
 
   socket.on('error', onSocketError);
 
@@ -69,6 +70,7 @@ server.on('upgrade', function (request, socket, head) {
 
 // 服务器被客户端连接
 wss.on('connection', (ws, req) => {
+  console.log(req.session)
 
   const userId = req.session.userId
   const userName = req.session.userName;
