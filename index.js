@@ -47,7 +47,6 @@ const wss = new WebSocketServer({ clientTracking: true, noServer: true });
 
 // 监听upgrade
 server.on('upgrade', function (request, socket, head) {
-  console.log('upgrade')
 
   socket.on('error', onSocketError);
 
@@ -70,8 +69,6 @@ server.on('upgrade', function (request, socket, head) {
 
 // 服务器被客户端连接
 wss.on('connection', (ws, req) => {
-  console.log(req.session)
-
   const userId = req.session.userId
   const userName = req.session.userName;
 
@@ -93,12 +90,13 @@ wss.on('connection', (ws, req) => {
 
   ws.on('message', (message) => {
     const msg = message.toString()
-    const { type, data } = JSON.parse(msg)
+    const { type, target, data } = JSON.parse(msg)
 
     wss.clients.forEach(client => {
+      const currentId = client.connectionId
       switch (type) {
         case 'connect':
-          if(data === client.connectionId) {
+          if(target === currentId) {
             client.send(JSON.stringify({
               type: 'connect',
               data: {
@@ -113,13 +111,11 @@ wss.on('connection', (ws, req) => {
         case 'answer':
         case 'accept':
         case 'denied':
-        case 'file-sender':
-        case 'file-receiver':
         case 'stream-offer':
         case 'stream-answer':
         case 'stream-abort':
         case 'new-ice-candidate':
-          if(client !== ws) {
+          if(target === currentId) {
             client.send(msg)
           }
           break;
@@ -145,6 +141,7 @@ wss.on('connection', (ws, req) => {
 
   // 关闭链接
   ws.on('close', function () {
+    console.log('close')
     map.delete(userId);
   });
 })

@@ -1,20 +1,11 @@
 const User = require('../models/user')
-const uuid = require('uuid')
 
 // 获取账户详情
 function userLogin(req, res, next) {
-  const session = uuid.v4();
   const user = {
     username: req.body.username,
     password: req.body.password,
   }
-
-  // if (req.body.password === '123456') {
-  //   req.session.userId = session
-  //   req.session.userName = req.body.userName
-
-  //   res.send({ code: 0 })
-  // }
 
   User
     .findOne({ ...user })
@@ -23,7 +14,7 @@ function userLogin(req, res, next) {
       
       if (data) {
         // set-session
-        req.session.userId = session
+        req.session.userId = data.id
         req.session.userName = data.username
 
         res.send({ code: 0 })
@@ -35,7 +26,7 @@ function userLogin(req, res, next) {
           .save(function(createErr, user) {
             if (createErr) return next(createErr)
             // set-session
-            req.session.userId = session
+            req.session.userId = user.id
             req.session.userName = user.username
 
             res.send({code: 0, data: user})
