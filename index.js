@@ -8,7 +8,7 @@ const WebSocketServer = WebSocket.Server
 
 const app = express()
 map = new Map()
-const cacheChannel = new Map()
+connect = new Map()
 // 设置默认 mongoose 连接
 const mongoDB = 'mongodb://127.0.0.1/admin';
 mongoose.set('strictQuery', false);
@@ -107,18 +107,23 @@ wss.on('connection', (ws, req) => {
           }
           
           break;
+        case 'accept':
+          connect.set(target, true)
+          connect.set(currentId, true)
         case 'offer':
         case 'answer':
-        case 'accept':
+        
         case 'denied':
         case 'stream-offer':
         case 'stream-answer':
         case 'stream-abort':
         case 'new-ice-candidate':
+          if(target === currentId) client.send(msg)
+          break;
         case 'close':
-          if(target === currentId) {
-            client.send(msg)
-          }
+          connect.delete(target)
+          connect.delete(currentId)
+          if(target === currentId) client.send(msg)
           break;
         default:
           if (client.readyState === WebSocket.OPEN) {

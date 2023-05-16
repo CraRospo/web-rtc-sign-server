@@ -7,12 +7,17 @@ router.post('/login', Users.userLogin);
 router.get('/group', (req, res, next) => {
 
   let data = []
-  for (const [key, value] of global.map) {
-    console.log(`${key} = ${value}`);
-    data.push({
-      id: key,
-      name: value
-    })
+  for (const [id, name] of global.map) {
+    if (id !== req.session.userId) {
+      const status = global.connect.has(id)
+
+      data.push({
+        id,
+        status,
+        name
+      })
+    }
+    
   }
 
   res.send(
