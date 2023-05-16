@@ -115,6 +115,7 @@ wss.on('connection', (ws, req) => {
         case 'stream-answer':
         case 'stream-abort':
         case 'new-ice-candidate':
+        case 'close':
           if(target === currentId) {
             client.send(msg)
           }
