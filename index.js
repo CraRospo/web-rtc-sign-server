@@ -109,7 +109,8 @@ wss.on('connection', (ws, req) => {
           break;
         case 'accept':
           connect.set(target, true)
-          connect.set(currentId, true)
+          connect.set(ws.connectionId, true)
+          client.send(JSON.stringify({ type: 'system' }))
         case 'offer':
         case 'answer':
         
@@ -122,8 +123,9 @@ wss.on('connection', (ws, req) => {
           break;
         case 'close':
           connect.delete(target)
-          connect.delete(currentId)
+          connect.delete(ws.connectionId)
           if(target === currentId) client.send(msg)
+          client.send(JSON.stringify({ type: 'system' }))
           break;
         default:
           if (client.readyState === WebSocket.OPEN) {
