@@ -100,8 +100,8 @@ wss.on('connection', (ws, req) => {
             client.send(JSON.stringify({
               type: 'connect',
               data: {
-                reqId: ws.connectionId,
-                reqName: map.get(ws.connectionId)
+                reqId: userId,
+                reqName: map.get(userId)
               }
             }))
           }
@@ -109,7 +109,7 @@ wss.on('connection', (ws, req) => {
           break;
         case 'accept':
           connect.set(target, true)
-          connect.set(ws.connectionId, true)
+          connect.set(userId, true)
           client.send(JSON.stringify({ type: 'system' }))
         case 'offer':
         case 'answer':
@@ -151,6 +151,7 @@ wss.on('connection', (ws, req) => {
   ws.on('close', function () {
     console.log('close')
     map.delete(userId);
+    connect.delete(userId)
   });
 })
 

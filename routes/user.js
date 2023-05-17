@@ -17,7 +17,6 @@ router.get('/group', (req, res, next) => {
         name
       })
     }
-    
   }
 
   res.send(
