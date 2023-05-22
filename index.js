@@ -1,6 +1,7 @@
 const express = require('express')
 const session = require('express-session')
-const http = require('http')
+const https = require('https')
+const fs = require('fs')
 const UserRouter = require('./routes/user')
 const mongoose = require('mongoose')
 const WebSocket = require('ws')
@@ -40,14 +41,19 @@ app.use('/api', UserRouter)
 app.set('port', 8010)
 
 // 创建serve实例
-const server = http.createServer(app)
+const server = https.createServer(
+  {
+    key: fs.readFileSync('/etc/nginx/nothingtosay.cn.key'), 
+    cert: fs.readFileSync('/etc/nginx/nothingtosay.cn_bundle.crt')
+  },
+  app
+)
 
 // 创建 websocket 服务器
 const wss = new WebSocketServer({ clientTracking: true, noServer: true });
 
 // 监听upgrade
 server.on('upgrade', function (request, socket, head) {
-
   socket.on('error', onSocketError);
 
   // 解析session
@@ -91,6 +97,7 @@ wss.on('connection', (ws, req) => {
   ws.on('message', (message) => {
     const msg = message.toString()
     const { type, target, data } = JSON.parse(msg)
+
 
     wss.clients.forEach(client => {
       const currentId = client.connectionId
@@ -149,7 +156,6 @@ wss.on('connection', (ws, req) => {
 
   // 关闭链接
   ws.on('close', function () {
-    console.log('close')
     map.delete(userId);
     connect.delete(userId)
   });
